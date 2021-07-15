@@ -2,8 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const dotenv = require('dotenv');
 
 const app = express();
+dotenv.config();
+app.use(bodyParser.json());
 app.use(cors());
 const port: number = 8080;
 if (process.env.NODE_ENV === 'development') {
