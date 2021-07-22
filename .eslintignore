@@ -1,1 +1,4 @@
 node_modules/**
+/eslintrc.js
+/script.ts
+/.eslintrc.js
