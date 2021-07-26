@@ -1,24 +1,134 @@
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model Account_types {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  Accounts Accounts[]
+}
+
+model Students {
+  id           Int         @id @default(autoincrement())
+  student_name String
+  class        String
+  status       String
+  Accounts     Accounts[]
+  Contracts    Contracts[]
+}
+
+model Admins {
+  id         Int        @id @default(autoincrement())
+  admin_name String
+  role       String
+  Accounts   Accounts[]
+}
+
+model Accounts {
+  id               Int           @id
+  id_account       Int
+  id_account_types Int
+  username         String        @unique @db.VarChar(70)
+  password         String        @db.VarChar(16)
+  Students         Students      @relation(fields: [id_account], references: [id])
+  Admins           Admins        @relation(fields: [id_account], references: [id])
+  Account_types    Account_types @relation(fields: [id_account_types], references: [id])
+
+  @@index([id_account], name: "FK_AdminID")
+  @@index([id_account_types], name: "id_account_types")
+}
+
+model Subject_matters {
+  id         Int          @id @default(autoincrement())
+  name       String
+  Contracts  Contracts[]
+  Indicators Indicators[]
+}
+
+model Indicators {
+  id              Int             @id @default(autoincrement())
+  id_subject      Int
+  topic           String
+  description     String
+  code_number     String
+  link            String
+  Subject_matters Subject_matters @relation(fields: [id_subject], references: [id])
+  Questions       Questions[]
+
+  @@index([id_subject], name: "id_subject")
+}
+
+model Contracts {
+  id              Int              @id @default(autoincrement())
+  id_student      Int
+  id_subject      Int
+  progress        String
+  status          String
+  link            String
+  Students        Students         @relation(fields: [id_student], references: [id])
+  Subject_matters Subject_matters  @relation(fields: [id_subject], references: [id])
+  Student_answer  Student_answer[]
+
+  @@index([id_student], name: "id_student")
+  @@index([id_subject], name: "id_subject")
+}
+
+model Student_answer {
+  id              Int       @id @default(autoincrement())
+  id_contract     Int
+  id_question     Int
+  id_answers      Int
+  numbers_of_loop Int
+  date            DateTime
+  Answers         Answers   @relation(fields: [id_answers], references: [id])
+  Contracts       Contracts @relation(fields: [id_contract], references: [id])
+  Questions       Questions @relation(fields: [id_question], references: [id])
+
+  @@index([id_answers], name: "id_answers")
+  @@index([id_contract], name: "id_contract")
+  @@index([id_question], name: "id_question")
+}
+
+model Questions {
+  id               Int                @id @default(autoincrement())
+  id_indicator     Int
+  question_types   Int
+  question         Int
+  Indicators       Indicators         @relation(fields: [id_indicator], references: [id])
+  Question_types   Question_types     @relation(fields: [question_types], references: [id])
+  Question_answers Question_answers[]
+  Student_answer   Student_answer[]
+
+  @@index([id_indicator], name: "id_indicator")
+  @@index([question_types], name: "question_types")
+}
+
+model Answers {
+  id               Int                @id @default(autoincrement())
+  answer           String
+  Question_answers Question_answers[]
+  Student_answer   Student_answer[]
+}
+
+model Question_answers {
+  id                 Int       @id @default(autoincrement())
+  id_question        Int
+  id_question_answer Int
+  status             String
+  Questions          Questions @relation(fields: [id_question], references: [id])
+  Answers            Answers   @relation(fields: [id_question_answer], references: [id])
+
+  @@index([id_question], name: "id_question")
+  @@index([id_question_answer], name: "id_question_answer")
+}
+
+model Question_types {
+  id        Int         @id @default(autoincrement())
+  name      String
+  Questions Questions[]
 }

@@ -1,5 +1,4 @@
 import morgan from 'morgan';
-// import * as bodyParser from 'body-parser';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express from 'express';
